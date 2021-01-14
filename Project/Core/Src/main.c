@@ -108,7 +108,7 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   lcd_init();
-  HAL_ADC_Start_DMA((ADC_HandleTypeDef*)&hadc1, (uint32_t*)adc_buf, (uint32_t)1);
+  HAL_ADC_Start_DMA(&hadc1, adc_buf, 2);	//&hadc1, saved in adc_buf, length 2
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -120,10 +120,12 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  //printf("HELLO WORLD count = %d \r\n");
+	  PA0_Vlotage = adc_buf[0]*(3.3/4096);
+	  PA1_Vlotage = adc_buf[1]*(3.3/4096);
+	  printf("\n PA0 Voltage is %.2f v\t\r\n PA1 Voltage is %.2f v\r\n\t",PA0_Vlotage,PA1_Vlotage);
 
-	  printf("ADC = %d\r\n",adc_buf[0]);
-	  	  printf("voltage: %f\r\n,(float)adc_buf[0]/4096*3.3");
-	  	HAL_Delay(250);
+
+	  	HAL_Delay(1000);
 	 /* int adc_value=get_adc_value();
 	  float voltage=adc_value*3.3/4032;
 	  printf("value:%i voltage:%.2f v\r\n",adc_value,voltage);*/
