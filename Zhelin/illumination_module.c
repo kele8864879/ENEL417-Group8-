@@ -29,6 +29,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stdio.h"	//printf function
+#include "string.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,9 +50,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t adc_buf[2];
-float PA0_Vlotage;
-float PA1_Vlotage;
 
 /* USER CODE END PV */
 
@@ -74,67 +73,6 @@ PUTCHAR_PROTOTYPE
     return ch;
 }
 
-void delay(uint16_t time)
-{
-	__HAL_TIM_SET_COUNTER(&htim1,0);
-	while (__HAL_TIM_GET_COUNTER (&htim1) < time);
-}
-
-uint32_t IC_Val1 = 0;
-uint32_t IC_Val2 = 0;
-uint32_t Difference = 0;
-uint8_t Is_First_Captured = 0;  // is the first value captured ?
-uint8_t Distance  = 0;
-
-#define TRIG_PIN GPIO_PIN_9
-#define TRIG_PORT GPIOA
-// Let's write the callback function
-
-void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
-{
-	if (htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)  // if the interrupt source is channel1
-	{
-		if (Is_First_Captured==0) // if the first value is not captured
-		{
-			IC_Val1 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1); // read the first value
-			Is_First_Captured = 1;  // set the first captured as true
-			// Now change the polarity to falling edge
-			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_FALLING);
-		}
-
-		else if (Is_First_Captured==1)   // if the first is already captured
-		{
-			IC_Val2 = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);  // read second value
-			__HAL_TIM_SET_COUNTER(htim, 0);  // reset the counter
-
-			if (IC_Val2 > IC_Val1)
-			{
-				Difference = IC_Val2-IC_Val1;
-			}
-
-			else if (IC_Val1 > IC_Val2)
-			{
-				Difference = (0xffff - IC_Val1) + IC_Val2;
-			}
-
-			Distance = Difference * .034/2;
-			Is_First_Captured = 0; // set it back to false
-
-			// set polarity to rising edge
-			__HAL_TIM_SET_CAPTUREPOLARITY(htim, TIM_CHANNEL_1, TIM_INPUTCHANNELPOLARITY_RISING);
-			__HAL_TIM_DISABLE_IT(&htim1, TIM_IT_CC1);
-		}
-	}
-}
-
-void HCSR04_Read (void)
-{
-	HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_SET);  // pull the TRIG pin HIGH
-	delay(10);  // wait for 10 us
-	HAL_GPIO_WritePin(TRIG_PORT, TRIG_PIN, GPIO_PIN_RESET);  // pull the TRIG pin low
-
-	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);
-}
 /* USER CODE END 0 */
 
 /**
@@ -144,7 +82,10 @@ void HCSR04_Read (void)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	uint16_t adc_buf[2];
+	float PA0_Vlotage;
+	float PA1_Vlotage;
+	float led_pwm = 250;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -169,12 +110,11 @@ int main(void)
   MX_ADC1_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
-  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_ADC_Start_DMA(&hadc1, adc_buf, 2);	//&hadc1, saved in adc_buf, length 2
+  HAL_TIM_PWM_Start(&htim2,TIM_CHANNEL_2);
   lcd_init();
-  //HAL_ADC_Start_DMA(&hadc1, adc_buf, 2);	//&hadc1, saved in adc_buf, length 2
-  HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -185,19 +125,28 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  //printf("HELLO WORLD count = %d \r\n");
 	  PA0_Vlotage = adc_buf[0]*(3.3/4096);
 	  PA1_Vlotage = adc_buf[1]*(3.3/4096);
 	  printf("\n PA0 Voltage is %.2f v\t\r\n PA1 Voltage is %.2f v\r\n\t",PA0_Vlotage,PA1_Vlotage);
-	  HAL_Delay(500);
+	 // HAL_Delay(500);
 
-	  HCSR04_Read();
+	  //LCD显示光照参数
+		char* buffer[2];
+		sprintf(buffer, "%.1f", PA0_Vlotage*107);
+		lcd_send_string("LM:");
+		lcd_send_string(buffer);
+		lcd_put_cur(0,0);
+		HAL_Delay(100);
+
+		//PWM led running
+		__HAL_TIM_SET_COMPARE(&htim2,TIM_CHANNEL_2,PA0_Vlotage*520);
+
+	 /* HCSR04_Read();
 	  lcd_send_data((Distance/100) + 48);   // 100th pos
 	  lcd_send_data(((Distance/10)%10) +48);  // 10th pos
 	  lcd_send_data((Distance%10)+48);  // 1st pos
 	  lcd_send_string(" cm");
-	  HAL_Delay(200);
-
+	  HAL_Delay(200);*/
   }
   /* USER CODE END 3 */
 }
