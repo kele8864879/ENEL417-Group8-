@@ -172,7 +172,7 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   lcd_init();
-  //HAL_ADC_Start_DMA(&hadc1, adc_buf, 2);	//&hadc1, saved in adc_buf, length 2
+ // HAL_ADC_Start_DMA(&hadc1, adc_buf, 2);	//&hadc1, saved in adc_buf, length 2
   HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1);
 
   /* USER CODE END 2 */
@@ -186,11 +186,12 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
 	  //printf("HELLO WORLD count = %d \r\n");
+	  /*
 	  PA0_Vlotage = adc_buf[0]*(3.3/4096);
 	  PA1_Vlotage = adc_buf[1]*(3.3/4096);
 	  printf("\n PA0 Voltage is %.2f v\t\r\n PA1 Voltage is %.2f v\r\n\t",PA0_Vlotage,PA1_Vlotage);
 	  HAL_Delay(500);
-
+	  */
 	  HCSR04_Read();
 	  lcd_send_data((Distance/100) + 48);   // 100th pos
 	  lcd_send_data(((Distance/10)%10) +48);  // 10th pos
