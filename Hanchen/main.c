@@ -140,7 +140,7 @@ int main(void)
 	  			  if(BufferX[length - 1] == '\r')
 	  			  {
 
-	  				  if (BufferX[0] == 'q')
+	  				  if (BufferX[0] == 'u')
 	  				  {
 	  					  while(1)
 	  					  {
@@ -151,19 +151,42 @@ int main(void)
 		  					  itoa(Distance, d, 10);
 		  					  HAL_UART_Transmit(&huart2, d, strlen((char *) d), 1000);
 		  					  HAL_Delay(500);
-		  					  if(Distance >= 100)
+		  					  if(Distance <= 3) //less than 3cm
 		  					  {
-		  						  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+		  						  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
 		  					  }
 		  					  else
 		  					  {
-		  						  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
-		  						  HAL_Delay(5000);
+		  						  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+		  						  break;
 		  					  }
 	  					  }
 
 	  				  }
+	  				  else if (BufferX[0] == 'd')
+	  				  {
 
+	  					  while(1)
+	  					  {
+		  					  HCSR04_Read();
+		  					  temp[0] = '\r';
+		  					  temp[1] = '\n';
+		  					  HAL_UART_Transmit(&huart2, temp, 2, 333);
+		  					  itoa(Distance, d, 10);
+		  					  HAL_UART_Transmit(&huart2, d, strlen((char *) d), 1000);
+		  					  HAL_Delay(500);
+		  					  if(Distance <= 10)
+		  					  {
+		  						  HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
+		  					  }
+		  					  else
+		  					  {
+		  						  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
+		  						  break;
+		  					  }
+	  					  }
+
+	  				  }
 
 	  				  else
 	  				  {
@@ -249,97 +272,7 @@ void HCSR04_Read (void)
 	__HAL_TIM_ENABLE_IT(&htim1, TIM_IT_CC1);
 }
 
-void running()
-{
-	 while( HAL_UART_Receive(&huart2,cliBufferRX,1,1000)== HAL_OK)
-	{
-		  HAL_UART_Transmit(&huart2,cliBufferRX,strlen((char *)cliBufferRX),1000);
-		  BufferX[length] = cliBufferRX[0];
-		  length++;
 
-		  if(BufferX[length - 1] == '\r')
-		  {
-
-			  if (BufferX[0] == 'f') // up
-	 		  {
-	 			  temp[0] = '\n';
-	 			  HAL_UART_Transmit(&huart2, temp, 1, 333);
-	 			  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
-	 			 __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_1, 800);
-	 			 HAL_Delay(5000);
-	 			 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
-	 			 /*
-	 			 if(distance <= 3)
-	 			 {
-	 			 	 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
-	 			 }
-
-	 			 */
-	 		  }
-
-	 		  else if (BufferX[0] == 'b') // down
-	 		  {
-	 			  temp[0] = '\n';
-
-	 			  HAL_UART_Transmit(&huart2, temp, 1, 333);
-	 			  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-	 			 __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 500);
-	 			 HAL_Delay(5000);
-	 			 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-	 			 /*
-	 			 if(distance <= value) // user input value, this distance is from LED to plant
-	 			 {
-	 			 	 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-	 			 }
-
-	 			 */
-
-	 		  }
-	 		  else if (BufferX[0] == 'd')
-	 		  {
-	 			  temp[0] = '\n';
-
-	 			  HAL_UART_Transmit(&huart2, temp, 1, 333);
-	 			  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-	 			 __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 500);
-
-	 		  }
-	 		  else if (BufferX[0] == 's')
-	 		  {
-	 			  temp[0] = '\n';
-	 			  HAL_UART_Transmit(&huart2, temp, 1, 333);
-	 			 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_1);
-	 			 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_3);
-	 			 HAL_TIM_PWM_Stop(&htim4, TIM_CHANNEL_4);
-	 		  }
-	 		  else if(BufferX[0] == 'c')
-	 		  {
-	 			  temp[0] = '\n';
-	 			  HAL_UART_Transmit(&huart2, temp, 1, 333);
-	 			  HCSR04_Read();
-				  strcpy((char *)cliBufferTX, "///////Input\r\n");
-				  HAL_UART_Transmit(&huart2, cliBufferTX, strlen((char *) cliBufferTX), 1000);
-
-
-	 		  }
-			  else
-			  {
-				  temp[0]='\r';
-				  temp[1]='\n';
-				  HAL_UART_Transmit(&huart2,temp,2,1000);
-				  strcpy((char *)cliBufferTX, "Invalid Input\r\n");
-				  HAL_UART_Transmit(&huart2, cliBufferTX, strlen((char *) cliBufferTX), 1000);
-			  }
-			  for (int i = 0; i < 1000; i++)
-			  {
-					cliBufferTX[i] = 0;
-			   	    cliBufferRX[i] = 0;
-				    BufferX[i]=0;
-				    length = 0;
-			  }
-		  }
-	}
-}
 /**
   * @brief System Clock Configuration
   * @retval None
