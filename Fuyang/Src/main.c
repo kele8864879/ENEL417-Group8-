@@ -343,7 +343,17 @@ void humidity_read()
 		       sprintf(msg,"%.1f%%", humidity);
 
 }
-
+/*void data_transmit()
+{
+	   char data[10];
+	   sprintf(data,"%.1f", humidity);
+	   HAL_UART_Transmit(&huart3,data,strlen((char *)data),1000);
+	   cliBufferTX[0]=',';
+	   HAL_UART_Transmit(&huart3,cliBufferTX,strlen((char *)cliBufferTX),200);
+	   HAL_UART_Transmit(&huart3,msg1,strlen((char *)msg1),1000);
+	   cliBufferTX[0]='\n';
+	   HAL_UART_Transmit(&huart3,cliBufferTX,strlen((char *)cliBufferTX),200);
+}*/
 
 void lcd()
 {
