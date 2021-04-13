@@ -1,0 +1,1 @@
+It is the code for main borad. Main board take charge of every function unless light elevation.
