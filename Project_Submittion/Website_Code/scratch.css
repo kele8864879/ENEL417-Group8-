@@ -1,0 +1,47 @@
+body {
+    font-family:Verdana,sans-serif;
+    font-size:100%;
+    background-color: beige;
+}
+
+section,article, aside{
+    border:1px solid grey;
+    margin:2px;
+    margin-bottom:5px;
+    padding:5px;
+    background-color:white;
+}
+.section_one{
+    float:left;
+    width: 49%;
+    hight: 50%;
+    position: relative;
+
+}
+
+.section_two{
+    float:right;
+    width: 49%;
+    hight: 50%;
+    position: relative;
+
+}
+p{
+    text-align: center;
+    font-size: 40px;
+}
+
+lo{
+    margin-right: 50px;
+}
+.table_sign_up{
+    margin-left: 35%;
+    width: 30%;
+    position:relative;
+    backgroud-color:white;
+}
+.s_u_footer{
+    position:fixed;
+    bottom: 0;
+    left: 0;
+}
