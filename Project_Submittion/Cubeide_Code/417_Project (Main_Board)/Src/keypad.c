@@ -7,28 +7,32 @@
 
 #include "main.h"
 #include "keypad.h"
-
+//Whenever a key is pressed, the connection between the row and column will be completed and the row pin will read 1. 
+//This will tell us that the row and column are both 1(high) and we will know what key was pressed.
+//Suppose I press "5" to recognize this number, pull the second row to high, and check the column. Whenever you press "5", the second row will become 1 because there is already a connection between the second row and the second column. 
+//Then this combination is defined as "5", the entire keyboard 4x4 combination has 16 situations, which is the defined 16 numbers or characters
 char read_keypad (void)
 {
-
+        // Make column 1 high and all other column low
 	HAL_GPIO_WritePin (C1_PORT, C1_PIN, GPIO_PIN_SET);
 	HAL_GPIO_WritePin (C2_PORT, C2_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C3_PORT, C3_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C4_PORT, C4_PIN, GPIO_PIN_RESET);
-
-    if (HAL_GPIO_ReadPin(R1_PORT, R1_PIN) == 1)
+    
+    if (HAL_GPIO_ReadPin(R1_PORT, R1_PIN) == 1)              //if the row 1 is high
     {
-    	while(HAL_GPIO_ReadPin(R1_PORT, R1_PIN) == 1)
+    	while(HAL_GPIO_ReadPin(R1_PORT, R1_PIN) == 1)         // wait till the button isn't pressed
     	{
 
     	}
-	    return '1';
+	    return '1';                                   
 
 	}
 
-    if (HAL_GPIO_ReadPin(R2_PORT, R2_PIN) == 1)
+    if (HAL_GPIO_ReadPin(R2_PORT, R2_PIN) == 1)              //if the row 2 is high
     {
-    	while(HAL_GPIO_ReadPin(R2_PORT, R2_PIN) == 1)
+    	while(HAL_GPIO_ReadPin(R2_PORT, R2_PIN) == 1)        //wait till the button isn't pressed
+    	{
     	{
 
     	}
@@ -36,9 +40,10 @@ char read_keypad (void)
 
 	}
 
-    if (HAL_GPIO_ReadPin(R3_PORT, R3_PIN) == 1)
+    if (HAL_GPIO_ReadPin(R3_PORT, R3_PIN) == 1)                //if the row 3 is high 
     {
-    	while(HAL_GPIO_ReadPin(R3_PORT, R3_PIN) == 1)
+    	while(HAL_GPIO_ReadPin(R3_PORT, R3_PIN) == 1)           // wait till the button isn't pressed
+    	{
     	{
 
     	}
@@ -46,16 +51,17 @@ char read_keypad (void)
 
 	}
 
-    if (HAL_GPIO_ReadPin(R4_PORT, R4_PIN) == 1)
+    if (HAL_GPIO_ReadPin(R4_PORT, R4_PIN) == 1)                    //if the row 4 is high
         {
-    	   while(HAL_GPIO_ReadPin(R4_PORT, R4_PIN) == 1)
+    	   while(HAL_GPIO_ReadPin(R4_PORT, R4_PIN) == 1)               // wait till the button isn't pressed
+    	{
     	   {
 
     	   }
     	   return '*';
 
     	}
-
+       // Make column 2 high and all other column low
 	HAL_GPIO_WritePin (C1_PORT, C1_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C2_PORT, C2_PIN, GPIO_PIN_SET);
 	HAL_GPIO_WritePin (C3_PORT, C3_PIN, GPIO_PIN_RESET);
@@ -101,7 +107,7 @@ char read_keypad (void)
 
     }
 
-
+       // Make column 3 high and all other column low
 	HAL_GPIO_WritePin (C1_PORT, C1_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C2_PORT, C2_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C3_PORT, C3_PIN, GPIO_PIN_SET);
@@ -145,7 +151,7 @@ char read_keypad (void)
 
     }
 
-
+       // Make column 4 high and all other column low
 	HAL_GPIO_WritePin (C1_PORT, C1_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C2_PORT, C2_PIN, GPIO_PIN_RESET);
 	HAL_GPIO_WritePin (C3_PORT, C3_PIN, GPIO_PIN_RESET);
